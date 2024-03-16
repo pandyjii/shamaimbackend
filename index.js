@@ -19,12 +19,15 @@ const usersRouter = require('./routes/Users');
 const authRouter = require('./routes/Auth');
 const cartRouter = require('./routes/Cart');
 const ordersRouter = require('./routes/Order');
+const contactRouter=require('./routes/CountactusRouter');
 const { User } = require('./model/User');
 const { isAuth, sanitizeUser, cookieExtractor } = require('./services/common');
 const path = require('path');
 const { Order } = require('./model/Order');
 const { env } = require('process');
 
+
+// const cors = require('cors'); 
 // Webhook
 
 // const endpointSecret = process.env.ENDPOINT_SECRET;
@@ -68,12 +71,20 @@ const { env } = require('process');
 
 // JWT options
 
+
+// const shiprocket = new Shiprocket({
+//   email: 'your_shiprocket_email@example.com',
+//   password: 'your_shiprocket_password',
+//   apiKey: 'your_shiprocket_api_key'
+// });
 const opts = {};
 opts.jwtFromRequest = cookieExtractor;
 opts.secretOrKey = process.env.JWT_SECRET_KEY; 
 
 //middlewares
-
+// const app = express();
+// app.use(bodyParser.json());
+// app.use(cors());
 server.use(express.static(path.resolve(__dirname, 'build')));
 server.use(cookieParser());
 server.use(
@@ -99,11 +110,9 @@ server.use('/users', isAuth(), usersRouter.router);
 server.use('/auth', authRouter.router);
 server.use('/cart', isAuth(), cartRouter.router);
 server.use('/orders', isAuth(), ordersRouter.router);
+server.use('/',contactRouter.router);
 
-// this line we add to make react router work in case of other routes doesnt match
-server.get('*', (req, res) =>
-  res.sendFile(path.resolve('build', 'index.html'))
-);
+
 
 // Passport Strategies
 passport.use(
@@ -178,29 +187,39 @@ passport.deserializeUser(function (user, cb) {
 // Payments
 
 // This is your test secret API key.
-const stripe = require('stripe')(process.env.STRIPE_SERVER_KEY);
+// const stripe = require('stripe')(process.env.STRIPE_SERVER_KEY);
 
-server.post('/create-payment-intent', async (req, res) => {
-  const { totalAmount, orderId } = req.body;
+// server.post('/create-payment-intent', async (req, res) => {
+//   const { totalAmount, orderId } = req.body;
 
-  // Create a PaymentIntent with the order amount and currency
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: totalAmount * 100, // for decimal compensation
-    currency: 'inr',
-    automatic_payment_methods: {
-      enabled: true,
-    },
-    metadata: {
-      orderId,
-    },
-  });
+//   // Create a PaymentIntent with the order amount and currency
+//   const paymentIntent = await stripe.paymentIntents.create({
+//     amount: totalAmount * 100, // for decimal compensation
+//     currency: 'inr',
+//     automatic_payment_methods: {
+//       enabled: true,
+//     },
+//     metadata: {
+//       orderId,
+//     },
+//   });
 
-  res.send({
-    clientSecret: paymentIntent.client_secret,
-  });
-});
+//   res.send({
+//     clientSecret: paymentIntent.client_secret,
+//   });
+// });
 
 
+
+
+// creating endpoint for popular in women
+
+// app.get('/popularinwomen',async(req,res)=>{
+//   let products=await Product.find({category:"Women"});
+//   let popular_in_women=products.slice(0,4);
+//   console.log("popular in women fetched");
+//   res.send(popular_in_women);
+// })
 
 main().catch((err) => console.log(err));
 

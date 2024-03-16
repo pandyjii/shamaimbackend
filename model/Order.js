@@ -13,7 +13,12 @@ const orderSchema = new Schema(
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     paymentMethod: { type: String, required: true, enum: paymentMethods },
     paymentStatus: { type: String, default: 'pending' },
-    status: { type: String, default: 'pending' },
+    // status: { type: String, default: 'pending' },
+    status: {
+      type: String,
+      enum: ['pending', 'shipped', 'delivered', 'canceled','returned'],
+      default: 'pending',
+    },
     selectedAddress: { type: Schema.Types.Mixed, required: true },
   },
   { timestamps: true }
