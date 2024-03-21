@@ -28,7 +28,6 @@ const { env } = require("process");
 
 const ShiprocketRouter = require("./routes/Shiprocket");
 
-// const cors = require('cors');
 // Webhook
 
 // const endpointSecret = process.env.ENDPOINT_SECRET;
@@ -188,44 +187,12 @@ passport.deserializeUser(function (user, cb) {
   });
 });
 
-// Payments
 
-// This is your test secret API key.
-// const stripe = require('stripe')(process.env.STRIPE_SERVER_KEY);
-
-// server.post('/create-payment-intent', async (req, res) => {
-//   const { totalAmount, orderId } = req.body;
-
-//   // Create a PaymentIntent with the order amount and currency
-//   const paymentIntent = await stripe.paymentIntents.create({
-//     amount: totalAmount * 100, // for decimal compensation
-//     currency: 'inr',
-//     automatic_payment_methods: {
-//       enabled: true,
-//     },
-//     metadata: {
-//       orderId,
-//     },
-//   });
-
-//   res.send({
-//     clientSecret: paymentIntent.client_secret,
-//   });
-// });
-
-// creating endpoint for popular in women
-
-// app.get('/popularinwomen',async(req,res)=>{
-//   let products=await Product.find({category:"Women"});
-//   let popular_in_women=products.slice(0,4);
-//   console.log("popular in women fetched");
-//   res.send(popular_in_women);
-// })
 
 main().catch((err) => console.log(err));
 
 async function main() {
-  // await mongoose.connect(process.env.MONGODB_URL);
+  await mongoose.connect(process.env.MONGODB_URL);
   console.log("database connected");
 }
 
