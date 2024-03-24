@@ -1,10 +1,10 @@
 const { Order } = require("../model/Order");
-const { nanoid } = require('nanoid');
+const { nanoid } = require("nanoid");
 const { Product } = require("../model/Product");
 const { User } = require("../model/User");
 const { sendMail, invoiceTemplate } = require("../services/common");
 const axios = require("axios");
-
+const Razorpay = require("razorpay");
 
 const shiprocketBaseUrl = "https://apiv2.shiprocket.in/v1/external/";
 const productDimensions = {
@@ -41,6 +41,25 @@ exports.fetchOrdersByUser = async (req, res) => {
     res.status(200).json(orders);
   } catch (err) {
     res.status(400).json(err);
+  }
+};
+
+exports.createRazorpayOrder = async (req, res) => {
+  const { amount } = req.body;
+  const instance = new Razorpay({
+    key_id: "rzp_test_UanPsB91bqtxk7",
+    key_secret: "cnOU08osB0BigfEQ9xxDAtYb",
+  });
+
+  try {
+    const response = await instance.orders.create({
+      amount: amount * 100,
+      currency: "INR",
+    });
+
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(400).json(error);
   }
 };
 
@@ -162,8 +181,6 @@ exports.deleteOrder = async (req, res) => {
   } catch (err) {
     res.status(400).json(err);
   }
-
-  
 };
 
 exports.updateOrder = async (req, res) => {
@@ -204,13 +221,9 @@ exports.fetchAllOrders = async (req, res) => {
   } catch (err) {
     res.status(400).json(err);
   }
-
-  
-
 };
 
 exports.cancelOrder = async (req, res) => {
- 
   try {
     const orderId = parseInt(req.params.orderId);
     const response = await axios.post(
@@ -230,11 +243,7 @@ exports.cancelOrder = async (req, res) => {
       error: error.message,
     });
   }
-
-
 };
-
-
 
 exports.returnOrder = async (req, res) => {
   try {
