@@ -78,8 +78,8 @@ exports.confirmOrder = async (req, res) => {
       phone,
       items,
       payMode,
-      payment_method, // Added to extract payment method
       billing_address, // Added to extract billing address
+      paymentDetails,
     } = req.body;
 
     for (let item of items) {
@@ -96,7 +96,7 @@ exports.confirmOrder = async (req, res) => {
     }
 
     // Validate required fields
-    if (!payment_method) {
+    if (!paymentDetails) {
       throw new Error("The payment method field is required.");
     }
 
@@ -157,14 +157,19 @@ exports.confirmOrder = async (req, res) => {
     );
 
     // Save the order to the database
-    const order = new Order(req.body);
-    const savedOrder = await order.save();
+    const order = new Order({
+      ...req.body,
+      shiprocketResponse: response.data,
+    });   
+     const savedOrder = await order.save();
+    
 
     // Send success response
     res.status(201).json({
       order: savedOrder,
       shiprocketResponse: response.data,
     });
+    
   } catch (err) {
     res.status(400).json({
       message: "Error creating order",
