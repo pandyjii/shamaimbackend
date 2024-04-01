@@ -5,6 +5,7 @@ const {
   fetchOrderById,
   fetchAllOrders,
   cancelOrder,
+  returnOrder,
 } = require("../controller/Shiprocket");
 
 const router = express.Router();
@@ -13,6 +14,7 @@ router
   .post("/create", createOrder)
   .get("/:orderId", fetchOrderById)
   .get("/", fetchAllOrders)
-  .post("/:orderId/cancel", cancelOrder);
+  .post("/:orderId/cancel", cancelOrder)
+  .post("/return", returnOrder);
 
 exports.router = router;

@@ -20,9 +20,9 @@ const authenticateShiprocket = async () => {
 };
 
 const addAuthTokenToHeader = async (req, res, next) => {
-  if (!shiprocketAuthToken) {
-    await authenticateShiprocket();
-  }
+  // if (!shiprocketAuthToken) {
+  await authenticateShiprocket();
+  // }
   if (shiprocketAuthToken) {
     req.headers["Authorization"] = `Bearer ${shiprocketAuthToken}`;
     req.headers["Content-Type"] = "application/json";

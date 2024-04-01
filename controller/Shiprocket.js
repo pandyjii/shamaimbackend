@@ -159,3 +159,72 @@ exports.cancelOrder = async (req, res) => {
     });
   }
 };
+
+exports.returnOrder = async (req, res) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      addressLine1,
+      addressLine2,
+      city,
+      pincode,
+      state,
+      email,
+      phone,
+      items,
+    } = req.body;
+    let productStats = getProductsStats(items);
+    let reqModal = {
+      // unique ID here
+      order_id: "",
+      order_date: new Date()
+        .toISOString()
+        .replace(/T/, " ")
+        .replace(/\..+/, ""),
+      pickup_customer_name: firstName,
+      pickup_last_name: lastName,
+      pickup_address: addressLine1,
+      pickup_address_2: addressLine2,
+      pickup_city: city,
+      pickup_pincode: pincode,
+      pickup_state: state,
+      pickup_country: "India",
+      pickup_email: email,
+      pickup_phone: phone,
+      shipping_customer_name: "Niladri",
+      shipping_last_name: "Biswas",
+      shipping_address: "11B, Bowali Mondal Road",
+      shipping_address_2: "",
+      shipping_city: "Kolkata",
+      shipping_pincode: "700026",
+      shipping_country: "India",
+      shipping_state: "West Bengal",
+      shipping_email: "shamaimlifestyle@gmail.com",
+      shipping_phone: "9875505219",
+      order_items: items,
+      payment_method: "Prepaid",
+      sub_total: productStats.totalProductPrice,
+      length: productStats.totalLength,
+      breadth: productStats.totalBreadth,
+      height: productStats.totalHeight,
+      weight: productStats.totalWeight,
+    };
+    const response = await axios.post(
+      `${shiprocketBaseUrl}orders/create/return`,
+      reqModal,
+      {
+        headers: {
+          Authorization: req.headers.Authorization,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    res.send({ message: "Order has been returned" });
+  } catch (error) {
+    res.status(400).json({
+      message: "Error canceling order",
+      error: error.message,
+    });
+  }
+};
