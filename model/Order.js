@@ -11,8 +11,8 @@ const orderSchema = new Schema(
     totalAmount: { type: Number },
     totalItems: { type: Number },
     user: { type: Schema.Types.ObjectId,  },
-    paymentDetails:{type:[Schema.Types.Mixed], required: true,  },
-    paymentStatus: { type: String, default: 'pending' },
+    paymentDetails:{type:[Schema.Types.Mixed],   },
+    payMode: { type: String },
     shiprocketResponse: { type:[ Schema.Types.Mixed] } ,// Adjust the type as per the structure of the Shiprocket response
     // status: { type: String, default: 'pending' },
     status: {
