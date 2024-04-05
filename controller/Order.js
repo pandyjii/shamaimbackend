@@ -43,167 +43,6 @@ exports.fetchOrdersByUser = async (req, res) => {
   }
 };
 
- 
-// exports.confirmOrder = async (req, res) => {
-//   // Extract required fields from the request body
-//   try {
-//     const {
-//       firstName,
-//       lastName,
-//       addressLine1,
-//       addressLine2,
-//       city,
-//       pincode,
-//       state,
-//       email,
-//       phone,
-//       items,
-//       billing_address, // Added to extract billing address
-//       paymentDetails,
-//       paymentStatus,
-//       orderDetails,
-     
-//     } = req.body;
-
-//     for (let item of items) {
-//       const productId = item.id;
-//       console.log(productId);
-//       console.log(Product);
-//       if (productId) {
-//         const product = await Product.findOne({ _id: productId });
-//         // Continue with product processing
-//       } else {
-//         // Handle the case where product ID is not available
-//         console.log("not found");
-//       }
-//     }
-//      let payMode;
-//     // Validate required fields
-//     if (!paymentDetails) {
-//       throw new Error("The payment method field is required.");
-//     }
-
-//     if (!billing_address) {
-//       throw new Error("The billing address field is required.");
-//     }
-
-//      if(orderDetails && orderDetails.id){
-//       payMode="prepaid"
-//      }
-//      else{
-//       payMode="cash"
-//      }
-
-//     // Create Shiprocket order payload
-//     const productStats = getProductsStats(items);
-//     const orderPayload = {
-//       // create a unique ID here
-//       order_id: nanoid(),
-//       order_date: new Date()
-//         .toISOString()
-//         .replace(/T/, " ")
-//         .replace(/\..+/, ""),
-      
-//       pickup_location: "Primary 2",
-//       billing_customer_name: firstName,
-//       billing_last_name: lastName,
-//       billing_address: addressLine1,
-//       billing_address_2: addressLine2,
-//       billing_city: city,
-//       billing_pincode: pincode,
-//       billing_state: state,
-//       billing_country: "India",
-//       billing_email: email,
-//       billing_phone: phone,
-//       shipping_is_billing: true,
-//       shipping_customer_name: "",
-//       shipping_last_name: "",
-//       shipping_address: "",
-//       shipping_address_2: "",
-//       shipping_city: "",
-//       shipping_pincode: "",
-//       shipping_country: "",
-//       shipping_state: "",
-//       shipping_email: "",
-//       shipping_phone: "",
-//       order_items: items,
-//       payment_method: payMode,
-//       sub_total: productStats.totalProductPrice,
-//       length: productStats.totalLength,
-//       breadth: productStats.totalBreadth,
-//       height: productStats.totalHeight,
-//       weight: productStats.totalWeight,
-//     };
-
-//     // Make request to Shiprocket API to create order
-//     const response = await axios.post(
-//       `${shiprocketBaseUrl}orders/create/adhoc`,
-//       orderPayload,
-//       {
-//         headers: {
-//           Authorization: req.headers.Authorization,
-//           "Content-Type": "application/json",
-//         },
-//       }
-//     );
-
-//     // Save the order to the database
-//     const order = new Order({
-//       ...req.body,
-//       shiprocketResponse: response.data,
-//       payMode:orderPayload.payment_method,
-
-      
-//     });   
-//      const savedOrder = await order.save();
-  
-//       console.log(orderPayload)
-//     // Send success response
-//     res.status(201).json({
-//       order: savedOrder,
-//       shiprocketResponse: response.data,
-//       payMode:orderPayload.payment_method,
-//     });
-    
-//   } catch (err) {
-//     res.status(400).json({
-//       message: "Error creating order",
-//       error: err.message,
-//     });
-//   }
-// };
-
-// exports.createRazorpayOrder = async (req, res) => {
-//   const { amount } = req.body;
-//   const instance = new Razorpay({
-//     key_id: "rzp_test_UanPsB91bqtxk7",
-//     key_secret: "cnOU08osB0BigfEQ9xxDAtYb",
-//   });
-
-//   try {
-//     const response = await instance.orders.create({
-//       amount: amount * 100,
-//       currency: "INR",
-//     });
-
-//     const orderDetails = {
-//       id: response.id,
-//       amount: response.amount / 100, // Convert back to original amount
-//       currency: response.currency,
-//       status: response.status,
-//       // Add more details as needed
-//     };
-
-
-//   // res.send(response);
-//   res.json({"responce":orderDetails})
-//   } catch (error) {
-//     res.status(400).json(error);
-//   }
-// };
-
-
-
 
 // Backend code
 exports.createRazorpayOrder = async (req, res) => {
@@ -221,12 +60,11 @@ exports.createRazorpayOrder = async (req, res) => {
 
    
     await confirmOrder(razorpayResponse);
-    res.json({ "response": razorpayResponse });
+    res.send( razorpayResponse );
   } catch (error) {
     res.status(400).json(error);
   }
 };
-
 // Function to confirm the order with payment details
 const confirmOrder = async (paymentDescription) => {
   try {
@@ -371,61 +209,6 @@ exports.confirmOrder = async (req, res) => {
 };
 
 
-
-
-
-
-
-// Backend code
-
-// exports.createRazorpayOrder = async (req, res) => {
-//   const { amount } = req.body;
-//   const instance = new Razorpay({
-//     key_id: "rzp_test_UanPsB91bqtxk7",
-//     key_secret: "cnOU08osB0BigfEQ9xxDAtYb",
-//   });
-
-//   try {
-//     const response = await instance.orders.create({
-//       amount: amount * 100,
-//       currency: "INR",
-//     });
-
-//     // Extract necessary data from the response
-//     const { id: razorpay_order_id } = response;
-
-//     // You may need to generate razorpay_payment_id and razorpay_signature here,
-//     // depending on your application's flow and requirements.
-
-//     // Example of generating a unique payment ID and signature
-//     const razorpay_payment_id = generateUniquePaymentId();
-//     const razorpay_signature = generateSignature(razorpay_payment_id, razorpay_order_id);
-
-//     // Send the necessary data in the response
-//     res.json({
-//       razorpay_order_id,
-//       razorpay_payment_id,
-//       razorpay_signature,
-//     });
-//   } catch (error) {
-//     res.status(400).json(error);
-//   }
-// };
-
-// Example functions to generate payment ID and signature
-function generateUniquePaymentId() {
-  // Generate a unique payment ID (you may use a library or method suitable for your application)
-  return 'unique_payment_id';
-}
-
-
-
-
-
-
-
-
-
 exports.deleteOrder = async (req, res) => {
   const { id } = req.params;
   try {
@@ -449,8 +232,6 @@ exports.updateOrder = async (req, res) => {
 };
 
 exports.fetchAllOrders = async (req, res) => {
-  // sort = {_sort:"price",_order="desc"}
-  // pagination = {_page:1,_limit=10}
   let query = Order.find({ deleted: { $ne: true } });
   let totalOrdersQuery = Order.find({ deleted: { $ne: true } });
 
