@@ -43,7 +43,6 @@ exports.fetchOrdersByUser = async (req, res) => {
   }
 };
 
-
 // Backend code
 exports.createRazorpayOrder = async (req, res) => {
   const { amount } = req.body;
@@ -58,9 +57,8 @@ exports.createRazorpayOrder = async (req, res) => {
       currency: "INR",
     });
 
-   
     await confirmOrder(razorpayResponse);
-    res.send( razorpayResponse );
+    res.send(razorpayResponse);
   } catch (error) {
     res.status(400).json(error);
   }
@@ -68,15 +66,13 @@ exports.createRazorpayOrder = async (req, res) => {
 // Function to confirm the order with payment details
 const confirmOrder = async (paymentDescription) => {
   try {
-    console.log('Payment details:', paymentDescription);
+    console.log("Payment details:", paymentDescription);
     console.log(paymentDescription);
   } catch (err) {
-    console.error('Error confirming order:', err);
+    console.error("Error confirming order:", err);
     // Handle error if necessary
   }
 };
-
-
 
 exports.confirmOrder = async (req, res) => {
   // Extract required fields from the request body
@@ -92,10 +88,7 @@ exports.confirmOrder = async (req, res) => {
       email,
       phone,
       items,
-      billing_address, // Added to extract billing address
       paymentDetails,
-      paymentStatus,
-      razorpayResponse,
     } = req.body;
 
     for (let item of items) {
@@ -110,27 +103,6 @@ exports.confirmOrder = async (req, res) => {
         console.log("not found");
       }
     }
-    let payMode;
-    // Validate required fields
-    
-
-    if (!billing_address) {
-      throw new Error("The billing address field is required.");
-    }
-
-    if (razorpayResponse && razorpayResponse.id) {
-      payMode = "prepaid";
-    } else {
-      payMode = "cash";
-    }
-     
-    try{
-   const shiprocketResponce=await confirmOrder(paymentDetails);
-   var paymentResponce=shiprocketResponce?shiprocketResponce:"cash"
-    }
-    catch(err){
-    console.log("err in confirming order",err)
-    }
 
     // Create Shiprocket order payload
     const productStats = getProductsStats(items);
@@ -141,7 +113,6 @@ exports.confirmOrder = async (req, res) => {
         .toISOString()
         .replace(/T/, " ")
         .replace(/\..+/, ""),
-
       pickup_location: "Primary 2",
       billing_customer_name: firstName,
       billing_last_name: lastName,
@@ -165,7 +136,7 @@ exports.confirmOrder = async (req, res) => {
       shipping_email: "",
       shipping_phone: "",
       order_items: items,
-      payment_method: payMode,
+      payment_method: paymentDetails.payMode,
       sub_total: productStats.totalProductPrice,
       length: productStats.totalLength,
       breadth: productStats.totalBreadth,
@@ -184,21 +155,18 @@ exports.confirmOrder = async (req, res) => {
         },
       }
     );
-  
+
     // Save the order to the database
     const order = new Order({
       ...req.body,
-      shiprocketResponse: response.data,
-      payMode: orderPayload.payment_method,
-      paymentDetails:paymentResponce
+      shipmentDetails: response.data,
     });
     const savedOrder = await order.save();
 
     // Send success response
     res.status(201).json({
-      order: savedOrder,
-      shiprocketResponse: response.data,
-      payMode: orderPayload.payment_method,
+      ...req.body,
+      shipmentDetails: response.data,
     });
   } catch (err) {
     res.status(400).json({
@@ -207,7 +175,6 @@ exports.confirmOrder = async (req, res) => {
     });
   }
 };
-
 
 exports.deleteOrder = async (req, res) => {
   const { id } = req.params;
@@ -296,7 +263,7 @@ exports.returnOrder = async (req, res) => {
     let productStats = getProductsStats(items);
     let reqModal = {
       // unique ID here
-      order_id:nanoid(),
+      order_id: nanoid(),
       order_date: new Date()
         .toISOString()
         .replace(/T/, " ")
