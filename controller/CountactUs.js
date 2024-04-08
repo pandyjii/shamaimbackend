@@ -1,4 +1,5 @@
 
+const { response } = require('express');
 const nodemailer = require('nodemailer');
 
 
@@ -7,13 +8,11 @@ const transporter = nodemailer.createTransport({
   host: 'smtp.ethereal.email',
   port: 587,
   auth: {
-      user: '	toy.stamm6@ethereal.email',
-      pass: 'e9Y6ryUkhywtyN7W84'
+      user: '	susana.nitzsche18@ethereal.email',
+      pass: 'q6PVb6e4KDjzF5W3J3'
   }
 });
   
-
-
 // API endpoint to send email
 exports.contacts= (req, res) => {
   const { to, subject, text } = req.body;
@@ -31,7 +30,7 @@ exports.contacts= (req, res) => {
       res.status(500).send('Error sending email');
     } else {
       console.log('Email sent: ' + info.response);
-      res.status(200).send('Email sent successfully');
+      res.status(200).send(response);
     }
   });
 

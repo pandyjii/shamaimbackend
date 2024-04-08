@@ -33,15 +33,7 @@ const getProductsStats = (items) => {
   };
 };
 
-exports.fetchOrdersByUser = async (req, res) => {
-  const { id } = req.user;
-  try {
-    const orders = await Order.find({ user: id });
-    res.status(200).json(orders);
-  } catch (err) {
-    res.status(400).json(err);
-  }
-};
+
 
 // Backend code
 exports.createRazorpayOrder = async (req, res) => {
@@ -93,8 +85,6 @@ exports.confirmOrder = async (req, res) => {
 
     for (let item of items) {
       const productId = item.id;
-      console.log(productId);
-      console.log(Product);
       if (productId) {
         const product = await Product.findOne({ _id: productId });
         // Continue with product processing
@@ -161,13 +151,15 @@ exports.confirmOrder = async (req, res) => {
       ...req.body,
       shipmentDetails: response.data,
     });
+
     const savedOrder = await order.save();
 
-    // Send success response
+   
     res.status(201).json({
       ...req.body,
       shipmentDetails: response.data,
     });
+    // res.send(savedOrder);
   } catch (err) {
     res.status(400).json({
       message: "Error creating order",
@@ -312,6 +304,18 @@ exports.returnOrder = async (req, res) => {
       message: "Error canceling order",
       error: error.message,
     });
+  }
+};
+
+exports.fetchOrdersByUser = async (req, res) => {
+  const { id } = req.user;
+  console.log(req.user);
+  try {
+    const orders = await Order.find({ user: id });
+    console.log(orders);
+    res.status(200).json(orders);
+  } catch (err) {
+    res.status(400).json(err);
   }
 };
 
